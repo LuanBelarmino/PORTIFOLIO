@@ -43,6 +43,245 @@
   :focus-visible{ outline:2px solid var(--mint); outline-offset:3px; }
 
   .wrap{ max-width:1040px; margin:0 auto; padding:0 24px; }
+  /* ---------- Card Wrapper & Expansion Drawer ---------- */
+  .api-card-wrapper {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    overflow: hidden;
+    transition: border-color .2s ease, transform .2s ease;
+  }
+  .api-card-wrapper:hover {
+    border-color: var(--mint-dim);
+  }
+  .api-card-wrapper .api-card {
+    border: none;
+    border-radius: 0;
+    background: transparent;
+  }
+  /* ---------- 3D Carousel Background Integrado ---------- */
+/* ---------- 3D Carousel Background — VERSÃO AMPLIADA ---------- */
+/* ---------- Container Principal de Fundo ---------- */
+.carousel-bg-wrapper {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0.35;
+}
+
+/* ---------- 1. Núcleo Central (Cubos) ---------- */
+.carousel-bg-wrapper .center-core {
+  position: absolute;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Alinha a inclinação do núcleo central com a do carrossel */
+  transform: perspective(1200px) rotateX(-10deg);
+}
+
+.carousel-bg-wrapper .boxes {
+  --size: 28px;
+  --duration: 800ms;
+  height: calc(var(--size) * 2);
+  width: calc(var(--size) * 3);
+  position: relative;
+  transform-style: preserve-3d;
+  transform-origin: 50% 50%;
+  transform: rotateX(60deg) rotateZ(45deg) rotateY(0deg) translateZ(0px);
+}
+
+.carousel-bg-wrapper .boxes .box {
+  width: var(--size);
+  height: var(--size);
+  top: 0;
+  left: 0;
+  position: absolute;
+  transform-style: preserve-3d;
+}
+
+.carousel-bg-wrapper .boxes .box:nth-child(1) {
+  transform: translate(100%, 0);
+  animation: box1 var(--duration) linear infinite;
+}
+
+.carousel-bg-wrapper .boxes .box:nth-child(2) {
+  transform: translate(0, 100%);
+  animation: box2 var(--duration) linear infinite;
+}
+
+.carousel-bg-wrapper .boxes .box:nth-child(3) {
+  transform: translate(100%, 100%);
+  animation: box3 var(--duration) linear infinite;
+}
+
+.carousel-bg-wrapper .boxes .box:nth-child(4) {
+  transform: translate(200%, 0);
+  animation: box4 var(--duration) linear infinite;
+}
+
+.carousel-bg-wrapper .boxes .box > div {
+  --background: #2f6d63;
+  --translateZ: calc(var(--size) / 2);
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: var(--background);
+  transform: rotateY(var(--rotateY, 0deg)) rotateX(var(--rotateX, 0deg)) translateZ(var(--translateZ));
+}
+
+.carousel-bg-wrapper .boxes .box > div:nth-child(1) {
+  --background: #5eead4; /* Mint destacado na face superior */
+  top: 0; left: 0;
+}
+
+.carousel-bg-wrapper .boxes .box > div:nth-child(2) {
+  --background: #1d4ed8;
+  right: 0; --rotateY: 90deg;
+}
+
+.carousel-bg-wrapper .boxes .box > div:nth-child(3) {
+  --background: #0f766e;
+  --rotateX: -90deg;
+}
+
+.carousel-bg-wrapper .boxes .box > div:nth-child(4) {
+  --background: #10141b;
+  top: 0; left: 0;
+  --translateZ: calc(var(--size) * 3 * -1);
+}
+
+/* ---------- 2. Carrossel Orbitando ao Redor ---------- */
+.carousel-bg-wrapper .inner {
+  --w: 180px; /* Largura do card */
+  --h: 240px; /* Altura do card */
+  /* Distância para garantir o espaço livre ao redor do núcleo */
+  --translateZ: calc((var(--w) + var(--h)) + 140px);
+  --rotateX: -10deg;
+  --perspective: 1200px;
+  
+  position: absolute;
+  width: var(--w);
+  height: var(--h);
+  transform-style: preserve-3d;
+  transform: perspective(var(--perspective));
+  animation: rotating 30s linear infinite;
+}
+
+@keyframes rotating {
+  from {
+    transform: perspective(var(--perspective)) rotateX(var(--rotateX)) rotateY(0);
+  }
+  to {
+    transform: perspective(var(--perspective)) rotateX(var(--rotateX)) rotateY(1turn);
+  }
+}
+
+.carousel-bg-wrapper .card {
+  position: absolute;
+  border: 1.5px solid var(--mint-dim);
+  border-radius: 12px;
+  overflow: hidden;
+  inset: 0;
+  background: var(--surface);
+  transform: rotateY(calc((360deg / var(--quantity)) * var(--index))) translateZ(var(--translateZ));
+  box-shadow: 0 0 20px rgba(94, 234, 212, 0.12);
+}
+
+.carousel-bg-wrapper .img {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle, rgba(94, 234, 212, 0.1) 0%, rgba(16, 20, 27, 0.9) 100%);
+}
+
+.carousel-bg-wrapper .img span {
+  font-family: var(--mono);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--mint);
+  letter-spacing: 0.05em;
+}
+
+/* Keyframes dos cubos */
+@keyframes box1 { 0%, 50% { transform: translate(100%, 0); } 100% { transform: translate(200%, 0); } }
+@keyframes box2 { 0% { transform: translate(0, 100%); } 50% { transform: translate(0, 0); } 100% { transform: translate(100%, 0); } }
+@keyframes box3 { 0%, 50% { transform: translate(100%, 100%); } 100% { transform: translate(0, 100%); } }
+@keyframes box4 { 0% { transform: translate(200%, 0); } 50% { transform: translate(200%, 100%); } 100% { transform: translate(100%, 100%); } }
+  /* Sanfona / Details styling */
+  .api-preview-drawer {
+    border-top: 1px solid var(--border);
+    background: var(--bg-raise);
+  }
+  .preview-trigger {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 24px;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    color: var(--muted);
+    cursor: pointer;
+    user-select: none;
+    transition: color .2s, background .2s;
+  }
+  .preview-trigger:hover {
+    color: var(--mint);
+    background: rgba(94, 234, 212, 0.03);
+  }
+  .api-preview-drawer[open] .chevron {
+    transform: rotate(180deg);
+  }
+  .chevron {
+    transition: transform .2s ease;
+    font-size: 10px;
+  }
+
+  /* Layout da Galeria */
+  .preview-content {
+    padding: 16px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .preview-gallery {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 6px;
+    scrollbar-width: thin;
+    scrollbar-color: #334155 transparent;
+  }
+  .preview-gallery a {
+    flex: 0 0 220px;
+    height: 130px;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    transition: border-color .2s;
+  }
+  .preview-gallery a:hover {
+    border-color: var(--mint);
+  }
+  .preview-gallery img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .preview-video video {
+    width: 100%;
+    max-height: 320px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: #000;
+  }
 
   /* ---------- Background grid ambience ---------- */
   .bg-grid{
@@ -129,10 +368,17 @@
     font-family:var(--mono); font-size:12px; color:var(--muted);
   }
   .terminal .tbar .dots span{ width:8px; height:8px; }
-  .terminal pre{
-    font-family:var(--mono); font-size:13.5px; padding:18px 20px;
-    color:#c9d1d9; overflow-x:auto;
-  }
+.terminal pre {
+  font-family: var(--mono);
+  font-size: 13.5px;
+  padding: 18px 20px;
+  color: #000000;
+  overflow-x: auto;
+  
+  /* Firefox */
+  scrollbar-width: thin;
+  scrollbar-color: #334155 transparent; 
+}
   .terminal .k{ color:var(--blue); }
   .terminal .s{ color:var(--amber); }
   .terminal .c{ color:var(--muted); }
@@ -255,8 +501,30 @@
 </style>
 </head>
 <body>
+  <div class="carousel-bg-wrapper">
+  
+  <div class="center-core">
+    <div class="boxes">
+      <div class="box"><div></div><div></div><div></div><div></div></div>
+      <div class="box"><div></div><div></div><div></div><div></div></div>
+      <div class="box"><div></div><div></div><div></div><div></div></div>
+      <div class="box"><div></div><div></div><div></div><div></div></div>
+    </div>
+  </div>
 
-<div class="bg-grid"></div>
+  <div class="inner" style="--quantity: 8;">
+    <div class="card" style="--index: 0;"><div class="img"><span>JS</span></div></div>
+    <div class="card" style="--index: 1;"><div class="img"><span>JAVA</span></div></div>
+    <div class="card" style="--index: 2;"><div class="img"><span>NODE</span></div></div>
+    <div class="card" style="--index: 3;"><div class="img"><span>SPRING</span></div></div>
+    <div class="card" style="--index: 4;"><div class="img"><span>POSTGRES</span></div></div>
+    <div class="card" style="--index: 5;"><div class="img"><span>PYTHON</span></div></div>
+    <div class="card" style="--index: 6;"><div class="img"><span>DOCKER</span></div></div>
+    <div class="card" style="--index: 7;"><div class="img"><span>GIT</span></div></div>
+  </div>
+
+</div>
+
 
 <header class="tabbar">
   <div class="tabbar-inner">
@@ -420,6 +688,7 @@
      apiUrl  -> link da API publicada (o que o avaliador vai acessar/testar)
      repoUrl -> link do repositório no GitHub
   ===================================================================== */
+  /* Adicionamos a propriedade "media" com um array de fotos (e opcionalmente vídeo) */
   const projects = [
     {
       method: "GET",
@@ -427,7 +696,12 @@
       desc: "Projeto voltado para analise comercial de vendas Avelloz motos, atualmente em desenvolvimento, usando Como Banco de dados GOOGLE SHEETS e hospedado no GitHub Pages, zero custos para a empresa.",
       tags: ["Node.js","GitHub", "JavaScript","html","CSS", "Google Sheets API"],
       apiUrl: "https://frostendjp.github.io/comercial-JS/",
-      repoUrl: "https://github.com/FROSTENDJP/comercial-JS.git"
+      repoUrl: "https://github.com/FROSTENDJP/comercial-JS.git",
+      images: [
+        "https://via.placeholder.com/400x250/141922/5eead4?text=Preview+1",
+        "https://via.placeholder.com/400x250/141922/5eead4?text=Preview+2"
+      ],
+      videoUrl: "" // Cole aqui o link de um MP4 se houver
     },
     {
       method: "POST",
@@ -435,34 +709,58 @@
       desc: "Descreva aqui o que essa API faz, em uma ou duas frases.",
       tags: ["Java", "Spring Boot", "Docker"],
       apiUrl: "https://sua-api-dois.exemplo.com",
-      repoUrl: "https://github.com/seuusuario/repositorio-dois"
-    },
-    {
-      method: "GET",
-      path: "/api/exemplo-tres",
-      desc: "Descreva aqui o que essa API faz, em uma ou duas frases.",
-      tags: ["TypeScript", "MongoDB"],
-      apiUrl: "https://sua-api-tres.exemplo.com",
-      repoUrl: "https://github.com/seuusuario/repositorio-tres"
+      repoUrl: "https://github.com/seuusuario/repositorio-dois",
+      images: [],
+      videoUrl: ""
     }
   ];
 
   const list = document.getElementById("api-list");
   list.innerHTML = projects.map(p => `
-    <div class="api-card">
-      <span class="method ${p.method.toLowerCase()}">${p.method}</span>
-      <div class="api-body">
-        <div class="path">
-          ${p.path}
-          <span class="status-dot"></span><span class="status-label">online</span>
+    <div class="api-card-wrapper">
+      <div class="api-card">
+        <span class="method ${p.method.toLowerCase()}">${p.method}</span>
+        <div class="api-body">
+          <div class="path">
+            ${p.path}
+            <span class="status-dot"></span><span class="status-label">online</span>
+          </div>
+          <div class="desc">${p.desc}</div>
+          <div class="tags">${p.tags.map(t => `<span>${t}</span>`).join("")}</div>
         </div>
-        <div class="desc">${p.desc}</div>
-        <div class="tags">${p.tags.map(t => `<span>${t}</span>`).join("")}</div>
+        <div class="api-actions">
+          <a class="open" href="${p.apiUrl}" target="_blank" rel="noopener">Abrir API ↗</a>
+          <a class="code" href="${p.repoUrl}" target="_blank" rel="noopener">Ver repositório</a>
+        </div>
       </div>
-      <div class="api-actions">
-        <a class="open" href="${p.apiUrl}" target="_blank" rel="noopener">Abrir API ↗</a>
-        <a class="code" href="${p.repoUrl}" target="_blank" rel="noopener">Ver repositório</a>
-      </div>
+
+      ${ (p.images?.length || p.videoUrl) ? `
+        <details class="api-preview-drawer">
+          <summary class="preview-trigger">
+            <span> galeria & demonstração</span>
+            <span class="chevron">▼</span>
+          </summary>
+          <div class="preview-content">
+            ${p.images?.length ? `
+              <div class="preview-gallery">
+                ${p.images.map(img => `
+                  <a href="${img}" target="_blank" rel="noopener">
+                    <img src="${img}" alt="Preview do projeto" />
+                  </a>
+                `).join('')}
+              </div>
+            ` : ''}
+
+            ${p.videoUrl ? `
+              <div class="preview-video">
+                <video controls>
+                  <source src="${p.videoUrl}" type="video/mp4">
+                </video>
+              </div>
+            ` : ''}
+          </div>
+        </details>
+      ` : '' }
     </div>
   `).join("");
 
