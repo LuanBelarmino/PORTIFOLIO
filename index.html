@@ -43,6 +43,81 @@
   :focus-visible{ outline:2px solid var(--mint); outline-offset:3px; }
 
   .wrap{ max-width:1040px; margin:0 auto; padding:0 24px; }
+
+
+  /* Estilo do Modal de Imagem */
+dialog#imageModal {
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.1));
+  border-radius: var(--radius, 12px);
+  background: var(--surface, #0e131f);
+  padding: 0;
+  max-width: 90vw;
+  max-height: 90vh;
+  box-shadow: 0 20px 40px -15px rgba(0,0,0,0.8);
+  overflow: hidden;
+}
+
+dialog#imageModal.video-modal {
+  width: min(900px, 92vw);
+}
+
+dialog#imageModal::backdrop {
+  background: rgba(10, 13, 18, 0.85);
+  backdrop-filter: blur(8px);
+}
+
+.modal-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-wrapper img {
+  max-width: 85vw;
+  max-height: 85vh;
+  object-fit: contain;
+  display: block;
+}
+
+.modal-wrapper video {
+  width: min(850px, 88vw);
+  max-height: 85vh;
+  display: block;
+  background: #000;
+}
+
+.close-modal-btn {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.2));
+  color: var(--text, #fff);
+  font-size: 20px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color .2s, border-color .2s;
+}
+
+.close-modal-btn:hover {
+  color: var(--mint, #5eeaed);
+  border-color: var(--mint-dim, rgba(94, 234, 212, 0.4));
+}
+
+.clickable-thumb {
+  cursor: pointer;
+  transition: transform .2s ease;
+}
+
+.clickable-thumb:hover {
+  transform: scale(1.03);
+}
   /* ---------- Card Wrapper & Expansion Drawer ---------- */
   /* =========================================================
    CARD DE CONTATO - ADAPTADO AO TEMA REAL DO PROJETO
@@ -415,7 +490,7 @@
     font-size: 10px;
   }
 
-  /* Layout da Galeria */
+  /* Cards de mídia com expansão ao clicar */
   .preview-content {
     padding: 16px 24px;
     display: flex;
@@ -430,21 +505,63 @@
     scrollbar-width: thin;
     scrollbar-color: #334155 transparent;
   }
-  .preview-gallery a {
+  .media-card {
+    position: relative;
     flex: 0 0 220px;
     height: 130px;
     border-radius: 6px;
     overflow: hidden;
     border: 1px solid var(--border);
-    transition: border-color .2s;
+    background: var(--surface-2);
+    cursor: pointer;
+    perspective: 1000px;
+    transition: transform .35s cubic-bezier(.175,.885,.32,1.275), border-color .2s, box-shadow .35s;
   }
-  .preview-gallery a:hover {
+  .media-card:hover,
+  .media-card:focus-visible {
+    transform: scale(1.04);
     border-color: var(--mint);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, .35);
   }
-  .preview-gallery img {
+  .media-card > img,
+  .media-card > video {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    transition: transform .5s ease, filter .5s ease;
+  }
+  .media-card:hover > img,
+  .media-card:hover > video {
+    transform: scale(1.08);
+    filter: brightness(.7);
+  }
+  .media-card__content {
+    position: absolute;
+    inset: 0;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    background: linear-gradient(transparent 25%, rgba(10, 13, 18, .92));
+    transform: rotateX(-90deg);
+    transform-origin: bottom;
+    transition: transform .45s cubic-bezier(.175,.885,.32,1.275);
+  }
+  .media-card:hover .media-card__content,
+  .media-card:focus-visible .media-card__content {
+    transform: rotateX(0deg);
+  }
+  .media-card__title {
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .media-card__hint {
+    color: var(--mint);
+    font-family: var(--mono);
+    font-size: 10px;
+    margin-top: 3px;
   }
   .preview-video video {
     width: 100%;
@@ -695,6 +812,15 @@
   </div>
 
 </div>
+<dialog id="imageModal" onclick="if(event.target === this) this.close()">
+  <div class="modal-wrapper">
+    <button type="button" class="close-modal-btn" onclick="document.getElementById('imageModal').close()">&times;</button>
+    <img id="modalImg" src="" alt="Visualização ampliada" />
+    <video id="modalVideo" controls hidden></video>
+  </div>
+</dialog>
+
+
 
 
 <header class="tabbar">
@@ -884,45 +1010,86 @@
 
 <script>
   /* =====================================================================
-     EDITE AQUI: lista de projetos / APIs.
-     Cada objeto vira um card automaticamente. Basta copiar um bloco,
-     colar abaixo e trocar os valores.
-
-     method  -> "GET" ou "POST" (cor do selo)
-     path    -> nome de exibição, estilo endpoint (ex: "/api/produtos")
-     desc    -> descrição curta do projeto
-     tags    -> tecnologias usadas (array de strings)
-     apiUrl  -> link da API publicada (o que o avaliador vai acessar/testar)
-     repoUrl -> link do repositório no GitHub
+     EDITAR PROJETOS
   ===================================================================== */
-  /* Adicionamos a propriedade "media" com um array de fotos (e opcionalmente vídeo) */
   const projects = [
     {
       method: "GET",
       path: "COMERCIAL AVELLOZ MOTOS ( GRUPO JS)",
-      desc: "Projeto voltado para analise comercial de vendas Avelloz motos, atualmente em desenvolvimento, usando Como Banco de dados GOOGLE SHEETS e hospedado no GitHub Pages, zero custos para a empresa.",
+      desc: "Projeto voltado para analise comercial de vendas Avelloz motos, atualmente em d  esenvolvimento, usando Como Banco de dados GOOGLE SHEETS e hospedado no GitHub Pages, zero custos para a empresa.",
       tags: ["Node.js","GitHub", "JavaScript","html","CSS", "Google Sheets API"],
       apiUrl: "https://frostendjp.github.io/comercial-JS/",
       repoUrl: "https://github.com/FROSTENDJP/comercial-JS.git",
-     images: [
-      "./assets/DASTc_central.png",
-      "./assets/lojas_exemplo.png",
-      "./assets/ranking_ewx.png"
-    ],
-      videoUrl: "" // Cole aqui o link de um MP4 se houver
+      images: [
+        "./assets/DASTc_central.png",
+        "./assets/lojas_exemplo.png",
+        "./assets/ranking_ewx.png"
+      ],
+      videoUrl: ""
     },
     {
       method: "POST",
-      path: "/api/exemplo-dois",
-      desc: "Descreva aqui o que essa API faz, em uma ou duas frases.",
-      tags: ["Java", "Spring Boot", "Docker"],
+      path: "DONALA JP ",
+      desc: "Sistema desenvolvido para organização financeira de uma otica em joao pessoa PB, FOCO na previsão e organização financeira",
+      tags: ["Javascript", "NODE JS"],
       apiUrl: "https://sua-api-dois.exemplo.com",
       repoUrl: "https://github.com/seuusuario/repositorio-dois",
       images: [],
       videoUrl: ""
+    },
+    {
+      method: "POST",
+      path: "GESTÃO OBRAS",
+      desc: "Sistema desenvolvido para organização de saidas de custos de obra da empresa GRUPO JS, atualmente com o desenvolvimento suspenso",
+      tags: ["Javascript", "NODE JS"],
+      apiUrl: "https://sua-api-tres.exemplo.com",
+      repoUrl: "https://github.com/LuanBelarmino/gest-o-obras.git",
+      images: [
+          "./assets/obras/addcontas.png",
+        "./assets/obras/confiobras.png",
+        "./assets/obras/image.png"
+
+
+
+      ],
+      
     }
   ];
 
+  // 1. Função para abrir o Modal com a imagem clicada
+  function openImageModal(src) {
+    const modal = document.getElementById("imageModal");
+    const modalImg = document.getElementById("modalImg");
+    const modalVideo = document.getElementById("modalVideo");
+    modal.classList.remove("video-modal");
+    modalVideo.pause();
+    modalVideo.removeAttribute("src");
+    modalVideo.hidden = true;
+    modalImg.hidden = false;
+    modalImg.src = src;
+    modal.showModal();
+  }
+
+  function openVideoModal(src) {
+    const modal = document.getElementById("imageModal");
+    const modalImg = document.getElementById("modalImg");
+    const modalVideo = document.getElementById("modalVideo");
+    modalImg.hidden = true;
+    modalImg.removeAttribute("src");
+    modalVideo.hidden = false;
+    modalVideo.src = src;
+    modal.classList.add("video-modal");
+    modal.showModal();
+    modalVideo.play().catch(() => {});
+  }
+
+  document.getElementById("imageModal").addEventListener("close", () => {
+    const modalVideo = document.getElementById("modalVideo");
+    modalVideo.pause();
+    modalVideo.removeAttribute("src");
+  });
+
+  // 2. Renderização dinâmica na página
   const list = document.getElementById("api-list");
   list.innerHTML = projects.map(p => `
     <div class="api-card-wrapper">
@@ -951,19 +1118,29 @@
           <div class="preview-content">
             ${p.images?.length ? `
               <div class="preview-gallery">
-                ${p.images.map(img => `
-                  <a href="${img}" target="_blank" rel="noopener">
-                    <img src="${img}" alt="Preview do projeto" />
-                  </a>
+                ${p.images.map((img, index) => `
+                  <div class="media-card" role="button" tabindex="0" onclick="openImageModal('${img}')" onkeydown="if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openImageModal('${img}'); }">
+                    <img src="${img}" alt="Preview ${index + 1} de ${p.path}" />
+                    <div class="media-card__content">
+                      <span class="media-card__title">${p.path}</span>
+                      <span class="media-card__hint">clique para ampliar</span>
+                    </div>
+                  </div>
                 `).join('')}
               </div>
             ` : ''}
 
             ${p.videoUrl ? `
-              <div class="preview-video">
-                <video controls>
-                  <source src="${p.videoUrl}" type="video/mp4">
-                </video>
+              <div class="preview-gallery">
+                <div class="media-card" role="button" tabindex="0" onclick="openVideoModal('${p.videoUrl}')" onkeydown="if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openVideoModal('${p.videoUrl}'); }">
+                  <video muted preload="metadata" aria-label="Demonstração em vídeo de ${p.path}">
+                    <source src="${p.videoUrl}" type="video/mp4">
+                  </video>
+                  <div class="media-card__content">
+                    <span class="media-card__title">${p.path}</span>
+                    <span class="media-card__hint">clique para assistir</span>
+                  </div>
+                </div>
               </div>
             ` : ''}
           </div>
