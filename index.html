@@ -295,9 +295,25 @@ dialog#imageModal::backdrop {
   box-shadow: 0 12px 30px -10px rgba(94, 234, 212, 0.25);
 }
 
-.card:hover .box {
+.card:hover .box,
+.card:focus-within .box,
+.card:active .box {
   bottom: -1px;
   left: -1px;
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .card {
+    overflow: visible;
+  }
+
+  .box {
+    position: absolute;
+    z-index: 2;
+    pointer-events: auto;
+    bottom: -1px;
+    left: -1px;
+  }
 }
 
 .card:hover .logo {
