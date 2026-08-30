@@ -16,7 +16,7 @@
     --surface-2: #1a212c;
     --border: #232b38;
     --text: #e7ebf1;
-    --muted: #8a94a6;
+    --muted: #a0ebf7;
     --mint: #5eead4;
     --mint-dim: #2f6d63;
     --amber: #f0b429;
@@ -1021,9 +1021,7 @@ dialog#imageModal::backdrop {
       apiUrl: "https://frostendjp.github.io/comercial-JS/",
       repoUrl: "https://github.com/FROSTENDJP/comercial-JS.git",
       images: [
-        "./assets/DASTc_central.png",
-        "./assets/lojas_exemplo.png",
-        "./assets/ranking_ewx.png"
+
       ],
       videoUrl: ""
     },
@@ -1032,7 +1030,6 @@ dialog#imageModal::backdrop {
       path: "DONALA JP ",
       desc: "Sistema desenvolvido para organização financeira de uma otica em joao pessoa PB, FOCO na previsão e organização financeira",
       tags: ["Javascript", "NODE JS"],
-      apiUrl: "https://sua-api-dois.exemplo.com",
       repoUrl: "https://github.com/seuusuario/repositorio-dois",
       images: [],
       videoUrl: ""
@@ -1042,17 +1039,9 @@ dialog#imageModal::backdrop {
       path: "GESTÃO OBRAS",
       desc: "Sistema desenvolvido para organização de saidas de custos de obra da empresa GRUPO JS, atualmente com o desenvolvimento suspenso",
       tags: ["Javascript", "NODE JS"],
-      apiUrl: "https://sua-api-tres.exemplo.com",
       repoUrl: "https://github.com/LuanBelarmino/gest-o-obras.git",
-      images: [
-          "./assets/obras/addcontas.png",
-        "./assets/obras/confiobras.png",
-        "./assets/obras/image.png"
-
-
-
-      ],
-      
+      images: [ ],
+      videoUrl: ""
     }
   ];
 
@@ -1102,11 +1091,10 @@ dialog#imageModal::backdrop {
           </div>
           <div class="desc">${p.desc}</div>
           <div class="tags">${p.tags.map(t => `<span>${t}</span>`).join("")}</div>
-        </div>
-        <div class="api-actions">
-          <a class="open" href="${p.apiUrl}" target="_blank" rel="noopener">Abrir API ↗</a>
-          <a class="code" href="${p.repoUrl}" target="_blank" rel="noopener">Ver repositório</a>
-        </div>
+       <div class="api-actions">
+            ${p.apiUrl ? `<a class="open" href="${p.apiUrl}" target="_blank" rel="noopener">Abrir API ↗</a>` : ""}
+            <a class="code" href="${p.repoUrl}" target="_blank" rel="noopener">Ver repositório</a>
+      </div>
       </div>
 
       ${ (p.images?.length || p.videoUrl) ? `
